@@ -1,0 +1,128 @@
+version: "3.8"
+
+services:
+  auth:
+    build: ./auth
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./auth/.env
+    depends_on:
+      - "mongo"
+    networks:
+      - ecommerce
+
+  # rabbitmq:
+  #   image: rabbitmq:3.8-management-alpine
+  #   container_name: 'rabbitmq'
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+  #   volumes:
+  #     - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+  #     - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+  #   networks:
+  #     - ecommerce
+
+  # order:
+  #   build: ./order
+  #   ports:
+  #     - "3002:3002"
+  #   depends_on:
+  #     - "mongo"
+  #     - rabbitmq
+  #   environment:
+  #     - RABBITMQ_URL=amqp://rabbitmq:5672
+  #   env_file:
+  #     - ./order/.env
+  #   networks:
+  #     - ecommerce
+  # order:
+  #   build: ./order
+  #   ports:
+  #     - "3002:3002"
+  #   depends_on:
+  #     - "mongo"
+  #     - "rabbitmq"
+  #   env_file:
+  #     - ./order/.env
+  #   networks:
+  #     - ecommerce
+
+  # order:
+  #   build: ./order_v2
+  #   ports:
+  #     - "3002:3002"
+  #   depends_on:
+  #     - "mongo"
+  #     - "rabbitmq"
+  #   env_file:
+  #     - ./order_v2/.env
+  #   networks:
+  #     - ecommerce
+
+  # product:
+  #   build: ./product
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     - rabbitmq
+  #   environment:
+  #     - RABBITMQ_URL=amqp://rabbitmq:5672
+  #   env_file:
+  #     - ./product/.env
+  #   networks:
+  #     - ecommerce
+
+  # product:
+  #   build: ./product
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     - "mongo"
+  #     - "rabbitmq"
+  #   env_file:
+  #     - ./product/.env
+  #   networks:
+  #     - ecommerce
+
+  # api-gateway:
+  #   build: ./api-gateway
+  #   ports:
+  #     - "3003:3003"
+  #   depends_on:
+  #     - "auth"
+  #     - "product"
+  #     - "order"
+  #     # - "order_v2"
+  #   networks:
+  #     - ecommerce
+
+  mongo:
+    image: mongo
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27012:27012"
+    networks:
+      - ecommerce
+  
+  # ui:
+  #   build: ./ui
+  #   env_file:
+  #     - ./ui/.env
+  #   ports:
+  #     - "8080:80"
+  #   networks:
+  #     - ecommerce
+
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+
+networks:
+  ecommerce:
