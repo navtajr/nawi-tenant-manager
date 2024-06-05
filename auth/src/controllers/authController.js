@@ -65,25 +65,19 @@ class AuthController {
   }
 
   async verify(req, res) {
-    console.log("CORS", req.headers)
-    if (req.headers['sec-fetch-mode'] === 'cors') {
-      res.status(200).json({ message: req.headers });
-    } else {
-      const token = req.headers['authorization'];
+    const token = req.headers['authorization'];
 
-      if (!token) {
-        return res.status(401).json({ error: 'No token provided' });
-      }
-    
-      try {
-        const decoded = jwt.verify(token, config.jwtSecret);
-        res.set('X-Auth-User', decoded.id);
-        res.status(200).json({ message: 'Token is valid' });
-      } catch (e) {
-        res.status(400).json({ message: "Token is not valid" });
-      }
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
     }
-    
+  
+    try {
+      const decoded = jwt.verify(token, config.jwtSecret);
+      res.set('X-Auth-User', decoded.id);
+      res.status(200).json({ message: 'Token is valid' });
+    } catch (e) {
+      res.status(400).json({ message: "Token is not valid" });
+    }
   }
 }
 

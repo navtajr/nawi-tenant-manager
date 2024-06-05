@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenant-manager
+spec:
+  selector:
+    matchLabels:
+      app: tenant-manager
+  template:
+    metadata:
+      labels:
+        app: tenant-manager
+        role: tenant-management
+    spec:
+      initContainers:
+        - name: mongo
+          image: mongo:latest
+          restartPolicy: Always
+          ports:
+            - name: mongo
+              containerPort: 27017
+              protocol: TCP
+      containers:
+        - name: tenant-manager
+          image: ghcr.io/hamidreza-ygh/tenant-manager:latest
+          env:
+            - name: ME_CONFIG_MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: tenant-manager-secrets
+                  key: ME_CONFIG_MONGODB_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tenant-manager-secrets
+                  key: JWT_SECRET
+          ports:
+            - name: auth
+              containerPort: 3000
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tenant-manager
+spec:
+  selector:
+    app: tenant-manager
+  ports:
+    - name: auth
+      port: 3000
+      protocol: TCP
+  type: ClusterIP
